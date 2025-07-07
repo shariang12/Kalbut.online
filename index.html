@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Laporan Kalbut</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      padding: 15px;
+      background-color: #f0f0f0;
+    }
+    h2 {
+      text-align: center;
+      color: #007166;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      background: #007166;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 16px;
+    }
+    textarea, select {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      margin-top: 10px;
+    }
+    .popup {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.6);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .popup-content {
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 400px;
+      max-height: 80%;
+      overflow-y: auto;
+    }
+    .popup-content h3 {
+      margin-top: 0;
+      font-size: 18px;
+      color: #007166;
+    }
+    .popup-content label {
+      display: block;
+      margin-bottom: 8px;
+    }
+    .close-btn {
+      background: #ccc;
+      color: #000;
+      margin-top: 10px;
+    }
+    .info-box {
+      margin: 10px 0;
+      padding: 10px;
+      background: #e6f7f6;
+      border-left: 5px solid #007166;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+<h2>APLIKASI KALBUT ONLINE</h2>
+
+<div class="info-box" id="infoPiket">Petugas Piket: <i>Belum dipilih</i></div>
+<button onclick="openPopup('popupPiket')">Pilih Petugas Piket</button>
+
+<div class="info-box" id="infoJaga">Petugas Jaga: <i>Belum dipilih</i></div>
+<button onclick="openPopup('popupJaga')">Pilih Petugas Jaga</button>
+
+<label>Kantor Pelabuhan</label>
+<select id="kantor">
+  <option value="aman">Aman</option>
+  <option value="tidak aman">Tidak Aman</option>
+</select>
+
+<label>Dermaga</label>
+<select id="dermaga">
+  <option value="aman">Aman</option>
+  <option value="tidak aman">Tidak Aman</option>
+</select>
+
+<label>Gudang Penyimpanan</label>
+<select id="gudang">
+  <option value="aman">Aman</option>
+  <option value="tidak aman">Tidak Aman</option>
+</select>
+
+<label>Area Parkir Kendaraan</label>
+<select id="parkir">
+  <option value="aman">Aman</option>
+  <option value="tidak aman">Tidak Aman</option>
+</select>
+
+<label>Kegiatan Pelabuhan</label>
+<select id="kegiatan">
+  <option value="nihil">Nihil</option>
+  <option value="ada">Ada</option>
+</select>
+
+<label>Keterangan Kegiatan</label>
+<textarea id="keterangan" placeholder="Isi jika ada kegiatan..."></textarea>
+
+<button onclick="kirimWhatsApp()">KIRIM LAPORAN</button>
+
+<!-- Popup Petugas Piket -->
+<div id="popupPiket" class="popup">
+  <div class="popup-content">
+    <h3>Pilih Petugas Piket</h3>
+    <label><input type="checkbox" value="ZAINURRAHMAN" class="piket"> ZAINURRAHMAN</label>
+    <label><input type="checkbox" value="EDI HERIYANTO" class="piket"> EDI HERIYANTO</label>
+    <label><input type="checkbox" value="DWI SANDY" class="piket"> DWI SANDY</label>
+    <label><input type="checkbox" value="ROBIANTO" class="piket"> ROBIANTO</label>
+    <button class="close-btn" onclick="closePopup('popupPiket', 'piket', 'infoPiket')">Simpan</button>
+  </div>
+</div>
+
+<!-- Popup Petugas Jaga -->
+<div id="popupJaga" class="popup">
+  <div class="popup-content">
+    <h3>Pilih Petugas Jaga</h3>
+    <label><input type="checkbox" value="IMAM SUKANDAR" class="jaga"> IMAM SUKANDAR</label>
+    <label><input type="checkbox" value="YANTIT ALAMSYAH" class="jaga"> YANTIT ALAMSYAH</label>
+    <label><input type="checkbox" value="SUPARYONO" class="jaga"> SUPARYONO</label>
+    <label><input type="checkbox" value="ACH GUFRON" class="jaga"> ACH GUFRON</label>
+    <label><input type="checkbox" value="ANDREAS EKO" class="jaga"> ANDREAS EKO</label>
+    <label><input type="checkbox" value="SUKARYONO" class="jaga"> SUKARYONO</label>
+    <button class="close-btn" onclick="closePopup('popupJaga', 'jaga', 'infoJaga')">Simpan</button>
+  </div>
+</div>
+
+<script>
+function openPopup(id) {
+  document.getElementById(id).style.display = "flex";
+}
+function closePopup(id, kelas, infoId) {
+  document.getElementById(id).style.display = "none";
+  const checked = Array.from(document.querySelectorAll(`input.${kelas}:checked`))
+    .map(el => el.value);
+  document.getElementById(infoId).innerHTML = `${kelas === 'piket' ? 'Petugas Piket' : 'Petugas Jaga'}: <b>${checked.join(', ') || 'Belum dipilih'}</b>`;
+}
+function getSelected(kelas) {
+  return Array.from(document.querySelectorAll(`input.${kelas}:checked`))
+    .map(el => el.value).join(', ');
+}
+function getShift(jam) {
+  const hour = parseInt(jam.split(":")[0]);
+  return (hour >= 8 && hour < 20) ? "Pagi" : "Malam";
+}
+function getCuaca(callback) {
+  fetch("https://api.open-meteo.com/v1/forecast?latitude=-7.724&longitude=114.007&current=temperature_2m,weather_code,wind_speed_10m&timezone=auto")
+    .then(res => res.json())
+    .then(data => {
+      const suhu = data.current.temperature_2m + "°C";
+      const angin = data.current.wind_speed_10m + " km/jam";
+      const kodeCuaca = data.current.weather_code;
+      const kondisi = {
+        0: "Cerah", 1: "Sebagian Cerah", 2: "Berawan", 3: "Mendung",
+        45: "Berkabut", 48: "Kabut Es", 51: "Gerimis Ringan", 53: "Gerimis Sedang",
+        55: "Gerimis Lebat", 61: "Hujan Ringan", 63: "Hujan Sedang",
+        65: "Hujan Lebat", 66: "Hujan Beku Ringan", 67: "Hujan Beku Lebat",
+        71: "Salju Ringan", 73: "Salju Sedang", 75: "Salju Lebat",
+        80: "Hujan Lokal", 81: "Hujan Lokal Sedang", 82: "Hujan Lokal Lebat"
+      };
+      const cuacaDeskripsi = kondisi[kodeCuaca] || "Tidak diketahui";
+      callback(`${cuacaDeskripsi} (${suhu})`, angin);
+    })
+    .catch(() => {
+      callback("Tidak tersedia", "Tidak tersedia");
+    });
+}
+function kirimWhatsApp() {
+  const now = new Date();
+  const tgl = now.toLocaleDateString('id-ID');
+  const jamRaw = now.toTimeString().split(" ")[0].substring(0,5);
+  const jam = `${jamRaw} WIB`;
+  const shift = getShift(jamRaw);
+  const piket = getSelected('piket');
+  const jaga = getSelected('jaga');
+  const kantor = document.getElementById("kantor").value;
+  const dermaga = document.getElementById("dermaga").value;
+  const gudang = document.getElementById("gudang").value;
+  const parkir = document.getElementById("parkir").value;
+  const kegiatan = document.getElementById("kegiatan").value;
+  const keterangan = document.getElementById("keterangan").value.trim() || "nihil";
+
+  getCuaca((cuaca, angin) => {
+    const isi =
+`*LAPORAN PENGAWASAN AREA PELABUHAN KALBUT* 
+*Hari/Tanggal*  : ${tgl}  
+*Nama Petugas Piket*: ${piket}
+*Nama Petugas Jaga*: ${jaga}  
+*Shift*: ${shift}  
+*Jam*: ${jam}  
+*Info Cuaca*: ${cuaca}  
+*Kecepatan Angin*: ${angin}  
+*AREA YANG DIPANTAU*
+
+Daftar Lokasi Pengawasan / Patroli:
+- Kantor Pelabuhan [${kantor}]
+- Dermaga [${dermaga}]
+- Gudang Penyimpanan [${gudang}]
+- Area Parkir Kendaraan [${parkir}]
+- Kegiatan Pelabuhan [${kegiatan}]  
+
+*KETERANGAN KEGIATAN*:  
+${kegiatan === "ada" ? keterangan : "nihil"}
+
+_Pesan laporan dikirim dari pesan otomatis by Kalbut.Online_`;
+
+    const tujuan = "6283852330333";
+    const encoded = encodeURIComponent(isi);
+    const waURL = `https://wa.me/${tujuan}?text=${encoded}`;
+    window.open(waURL, "_blank");
+  });
+}
+</script>
+
+</body>
+</html>
