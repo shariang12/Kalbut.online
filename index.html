@@ -120,11 +120,11 @@
 
 <h2>APLIKASI KALBUT ONLINE</h2>
 
-<!-- GIF dan Marquee -->
+<!-- GIF -->
 <div class="banner-container">
-  <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgzich3Hily9DIQvWrNSeLIGstR7Q6Tz9QxHRRrQLGV1OzLgkKry28RSVUhYVooYE1o1opgm1goBdnwWW4BdG-ENQ_sWqXlx9Yw98Eds1UVlVaLXm2K9cPlD3q3F8rKoL3OgbZYQYVo3aaE_3ia2eMswcYhpOy6HWrb2-DOCBdIxcV7LZYdYwn5DqlMrA/s400/1000071308.gif" alt="Banner GIF">
+  <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgzich3Hily9DIQvWrNSeLIGstR7Q6Tz9QxHRRrQLGV1OzLgkKry28RSVUhYVooYE1o1opgm1goBdnwWW4BdG-ENQ_sWqXlx9Yw98Eds1UVlVaLXm2K9cPlD3q3F8rKoL3OgbZYQYVo3aaE_3ia2eMswcYhpOy6HWrb2-DOCBdIxcV7LZYdYwn5DqlMrA/s400/1000071308.gif" alt="Kalbut Banner">
   <div class="banner-text">
-    <marquee scrollamount="5">VERSI 4 - ● Ijinkan akses lokasi agar bisa mengambil data ombak secara real ●SEMANGAT BERTUGAS! | PASTIKAN AREA AMAN | LAPORAN WAJIB SETIAP SHIFT</marquee>
+    <marquee scrollamount="5">VERSI 4 - SEMANGAT BERTUGAS! | PASTIKAN AREA AMAN | LAPORAN WAJIB SETIAP SHIFT</marquee>
   </div>
 </div>
 
@@ -156,7 +156,7 @@
   <button onclick="kirimWhatsApp()">KIRIM LAPORAN</button>
 </div>
 
-<!-- Popups -->
+<!-- Popup Piket -->
 <div id="popupPiket" class="popup">
   <div class="popup-content">
     <h3>Pilih Petugas Piket</h3>
@@ -168,6 +168,7 @@
   </div>
 </div>
 
+<!-- Popup Jaga -->
 <div id="popupJaga" class="popup">
   <div class="popup-content">
     <h3>Pilih Petugas Jaga</h3>
@@ -187,25 +188,34 @@ function openPopup(id) {
 }
 function closePopup(id, kelas, infoId) {
   document.getElementById(id).style.display = "none";
-  const checked = Array.from(document.querySelectorAll(`input.${kelas}:checked`)).map(el => el.value);
+  const checked = Array.from(document.querySelectorAll(`input.${kelas}:checked`))
+    .map(el => el.value);
   document.getElementById(infoId).innerHTML = `${kelas === 'piket' ? 'Petugas Piket' : 'Petugas Jaga'}: <b>${checked.join(', ') || 'Belum dipilih'}</b>`;
 }
 function getSelected(kelas) {
-  return Array.from(document.querySelectorAll(`input.${kelas}:checked`)).map(el => el.value).join(', ');
+  return Array.from(document.querySelectorAll(`input.${kelas}:checked`))
+    .map(el => el.value).join(', ');
 }
 function getShift(jam) {
   const hour = parseInt(jam.split(":")[0]);
   return (hour >= 8 && hour < 20) ? "Pagi" : "Malam";
 }
+
 function getCuaca(callback) {
-  function fetchWeather(lat, lon) {
-    fetch(`https://marine-api.open-meteo.com/v1/marine?latitude=${lat}&longitude=${lon}&current=wave_height,wind_speed_10m,weather_code,temperature_2m&timezone=auto`)
-      .then(res => res.json())
-      .then(data => {
-        const suhu = data.current.temperature_2m + "°C";
-        const angin = data.current.wind_speed_10m + " km/jam";
-        const ombak = data.current.wave_height + " m";
-        const kodeCuaca = data.current.weather_code;
+  const fallbackLat = -7.724;
+  const fallbackLon = 114.007;
+  function fetchData(lat, lon) {
+    const urlCuaca = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code,wind_speed_10m&timezone=auto`;
+    const urlOmbak = `https://marine-api.open-meteo.com/v1/marine?latitude=${lat}&longitude=${lon}&current=wave_height&timezone=auto`;
+
+    Promise.all([fetch(urlCuaca).then(r => r.json()), fetch(urlOmbak).then(r => r.json())])
+      .then(([cuacaData, ombakData]) => {
+        const suhu = cuacaData.current?.temperature_2m + "°C" || "tidak tersedia";
+        const angin = cuacaData.current?.wind_speed_10m + " km/jam" || "tidak tersedia";
+        const kodeCuaca = cuacaData.current?.weather_code;
+        const wave = ombakData.current?.wave_height;
+        const ombak = (wave !== undefined) ? `${wave} m` : "tidak tersedia";
+
         const kondisi = {
           0: "Cerah", 1: "Sebagian Cerah", 2: "Berawan", 3: "Mendung",
           45: "Berkabut", 48: "Kabut Es", 51: "Gerimis Ringan", 53: "Gerimis Sedang",
@@ -213,19 +223,19 @@ function getCuaca(callback) {
         };
         const cuacaDeskripsi = kondisi[kodeCuaca] || "Tidak diketahui";
         callback(`${cuacaDeskripsi} (${suhu})`, angin, ombak);
-      })
-      .catch(() => callback("Tidak tersedia", "-", "-"));
+      }).catch(() => callback("Tidak tersedia", "-", "-"));
   }
 
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(
-      pos => fetchWeather(pos.coords.latitude, pos.coords.longitude),
-      () => fetchWeather(-7.724, 114.007)
+      pos => fetchData(pos.coords.latitude, pos.coords.longitude),
+      () => fetchData(fallbackLat, fallbackLon)
     );
   } else {
-    fetchWeather(-7.724, 114.007);
+    fetchData(fallbackLat, fallbackLon);
   }
 }
+
 function kirimWhatsApp() {
   const now = new Date();
   const tgl = now.toLocaleDateString('id-ID');
@@ -244,32 +254,29 @@ function kirimWhatsApp() {
   getCuaca((cuaca, angin, ombak) => {
     const isi =
 `*LAPORAN PENGAWASAN AREA PELABUHAN KALBUT* 
-*Hari/Tanggal*: ${tgl}  
-*Nama Petugas Piket*: ${piket}
-*Nama Petugas Jaga*: ${jaga}  
-*Shift*: ${shift}  
-*Jam*: ${jam}  
-*Cuaca*: ${cuaca}  
-*Angin*: ${angin}  
+*Hari/Tanggal*: ${tgl}
+*Jam*: ${jam}
+*Shift*: ${shift}
+*Petugas Piket*: ${piket}
+*Petugas Jaga*: ${jaga}
+*Cuaca*: ${cuaca}
+*Angin*: ${angin}
 *Ketinggian Ombak*: ${ombak}
 
-*AREA YANG DIPANTAU*
-- Kantor Pelabuhan: [${kantor}]
-- Dermaga: [${dermaga}]
-- Gudang Penyimpanan: [${gudang}]
-- Area Parkir Kendaraan: [${parkir}]
-- Kegiatan Pelabuhan: [${kegiatan}]  
+*PENGAWASAN AREA*:
+- Kantor Pelabuhan: ${kantor}
+- Dermaga: ${dermaga}
+- Gudang Penyimpanan: ${gudang}
+- Area Parkir Kendaraan: ${parkir}
+- Kegiatan Pelabuhan: ${kegiatan}
+*Keterangan Kegiatan*: ${kegiatan === "ada" ? keterangan : "nihil"}
 
-*KETERANGAN KEGIATAN*  
-${kegiatan === "ada" ? keterangan : "nihil"}
-
-_Pesan ini dikirim otomatis oleh Kalbut Online_`;
+_Pesan otomatis by Kalbut.Online_`;
 
     const waURL = `https://wa.me/?text=${encodeURIComponent(isi)}`;
     window.open(waURL, "_blank");
   });
 }
 </script>
-
 </body>
 </html>
