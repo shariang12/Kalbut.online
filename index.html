@@ -3,34 +3,65 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Laporan Kalbut</title>
+  <title>Laporan Kalbut 3D</title>
   <style>
+    :root {
+      --tosca: #007166;
+      --light: #f8f9fa;
+      --shadow: rgba(0,0,0,0.2);
+    }
     body {
       font-family: 'Segoe UI', sans-serif;
       padding: 15px;
-      background-color: #f0f0f0;
+      background: linear-gradient(to bottom, #e6f7f6, #ffffff);
     }
     h2 {
       text-align: center;
-      color: #007166;
+      color: var(--tosca);
+      margin-bottom: 10px;
+      text-shadow: 1px 1px 2px #ccc;
+    }
+    .card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 6px 16px var(--shadow);
+      padding: 20px;
+      margin-bottom: 20px;
     }
     button {
       width: 100%;
-      padding: 12px;
-      margin-top: 10px;
-      background: #007166;
-      color: #fff;
+      padding: 14px;
+      margin-top: 12px;
+      background: var(--tosca);
+      color: white;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
       font-weight: bold;
       font-size: 16px;
+      box-shadow: 0 4px 8px var(--shadow);
+      transition: all 0.2s ease-in-out;
     }
-    textarea, select {
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px var(--shadow);
+      cursor: pointer;
+    }
+    select, textarea {
       width: 100%;
-      padding: 10px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
+      padding: 12px;
       margin-top: 10px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+      box-shadow: inset 0 2px 4px #e0e0e0;
+    }
+    .info-box {
+      background: #ffffff;
+      padding: 12px;
+      border-left: 5px solid var(--tosca);
+      border-radius: 8px;
+      box-shadow: 0 2px 6px var(--shadow);
+      margin: 10px 0;
     }
     .popup {
       display: none;
@@ -40,37 +71,48 @@
       background: rgba(0,0,0,0.6);
       justify-content: center;
       align-items: center;
-      z-index: 1000;
+      z-index: 999;
     }
     .popup-content {
       background: #fff;
       padding: 20px;
-      border-radius: 10px;
+      border-radius: 14px;
       width: 90%;
       max-width: 400px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
       max-height: 80%;
       overflow-y: auto;
     }
     .popup-content h3 {
       margin-top: 0;
       font-size: 18px;
-      color: #007166;
+      color: var(--tosca);
     }
     .popup-content label {
       display: block;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
     }
-    .close-btn {
-      background: #ccc;
-      color: #000;
-      margin-top: 10px;
+    .banner-container {
+      position: relative;
+      margin-bottom: 20px;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.3);
     }
-    .info-box {
-      margin: 10px 0;
-      padding: 10px;
-      background: #e6f7f6;
-      border-left: 5px solid #007166;
+    .banner-container img {
+      width: 100%;
+      display: block;
+    }
+    .banner-text {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      background: linear-gradient(to right, rgba(0,113,102,0.8), rgba(0,113,102,0.6));
+      color: white;
+      font-weight: bold;
+      text-shadow: 1px 1px 2px black;
       font-size: 14px;
+      padding: 6px;
     }
   </style>
 </head>
@@ -78,48 +120,57 @@
 
 <h2>APLIKASI KALBUT ONLINE</h2>
 
-<div class="info-box" id="infoPiket">Petugas Piket: <i>Belum dipilih</i></div>
-<button onclick="openPopup('popupPiket')">Pilih Petugas Piket</button>
+<div class="banner-container">
+  <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgzich3Hily9DIQvWrNSeLIGstR7Q6Tz9QxHRRrQLGV1OzLgkKry28RSVUhYVooYE1o1opgm1goBdnwWW4BdG-ENQ_sWqXlx9Yw98Eds1UVlVaLXm2K9cPlD3q3F8rKoL3OgbZYQYVo3aaE_3ia2eMswcYhpOy6HWrb2-DOCBdIxcV7LZYdYwn5DqlMrA/s400/1000071308.gif" alt="Banner GIF">
+  <div class="banner-text">
+    <marquee scrollamount="5">VERSI 4 - SEMANGAT BERTUGAS! | PASTIKAN AREA AMAN | LAPORAN WAJIB SETIAP SHIFT</marquee>
+  </div>
+</div>
 
-<div class="info-box" id="infoJaga">Petugas Jaga: <i>Belum dipilih</i></div>
-<button onclick="openPopup('popupJaga')">Pilih Petugas Jaga</button>
+<div class="card">
+  <div class="info-box" id="infoPiket">Petugas Piket: <i>Belum dipilih</i></div>
+  <button onclick="openPopup('popupPiket')">Pilih Petugas Piket</button>
 
-<label>Kantor Pelabuhan</label>
-<select id="kantor">
-  <option value="aman">Aman</option>
-  <option value="tidak aman">Tidak Aman</option>
-</select>
+  <div class="info-box" id="infoJaga">Petugas Jaga: <i>Belum dipilih</i></div>
+  <button onclick="openPopup('popupJaga')">Pilih Petugas Jaga</button>
 
-<label>Dermaga</label>
-<select id="dermaga">
-  <option value="aman">Aman</option>
-  <option value="tidak aman">Tidak Aman</option>
-</select>
+  <label>Kantor Pelabuhan</label>
+  <select id="kantor">
+    <option value="aman">Aman</option>
+    <option value="tidak aman">Tidak Aman</option>
+  </select>
 
-<label>Gudang Penyimpanan</label>
-<select id="gudang">
-  <option value="aman">Aman</option>
-  <option value="tidak aman">Tidak Aman</option>
-</select>
+  <label>Dermaga</label>
+  <select id="dermaga">
+    <option value="aman">Aman</option>
+    <option value="tidak aman">Tidak Aman</option>
+  </select>
 
-<label>Area Parkir Kendaraan</label>
-<select id="parkir">
-  <option value="aman">Aman</option>
-  <option value="tidak aman">Tidak Aman</option>
-</select>
+  <label>Gudang Penyimpanan</label>
+  <select id="gudang">
+    <option value="aman">Aman</option>
+    <option value="tidak aman">Tidak Aman</option>
+  </select>
 
-<label>Kegiatan Pelabuhan</label>
-<select id="kegiatan">
-  <option value="nihil">Nihil</option>
-  <option value="ada">Ada</option>
-</select>
+  <label>Area Parkir Kendaraan</label>
+  <select id="parkir">
+    <option value="aman">Aman</option>
+    <option value="tidak aman">Tidak Aman</option>
+  </select>
 
-<label>Keterangan Kegiatan</label>
-<textarea id="keterangan" placeholder="Isi jika ada kegiatan..."></textarea>
+  <label>Kegiatan Pelabuhan</label>
+  <select id="kegiatan">
+    <option value="nihil">Nihil</option>
+    <option value="ada">Ada</option>
+  </select>
 
-<button onclick="kirimWhatsApp()">KIRIM LAPORAN</button>
+  <label>Keterangan Kegiatan</label>
+  <textarea id="keterangan" placeholder="Isi jika ada kegiatan..."></textarea>
 
-<!-- Popup Petugas Piket -->
+  <button onclick="kirimWhatsApp()">KIRIM LAPORAN</button>
+</div>
+
+<!-- Popups -->
 <div id="popupPiket" class="popup">
   <div class="popup-content">
     <h3>Pilih Petugas Piket</h3>
@@ -131,7 +182,6 @@
   </div>
 </div>
 
-<!-- Popup Petugas Jaga -->
 <div id="popupJaga" class="popup">
   <div class="popup-content">
     <h3>Pilih Petugas Jaga</h3>
@@ -151,13 +201,11 @@ function openPopup(id) {
 }
 function closePopup(id, kelas, infoId) {
   document.getElementById(id).style.display = "none";
-  const checked = Array.from(document.querySelectorAll(`input.${kelas}:checked`))
-    .map(el => el.value);
+  const checked = Array.from(document.querySelectorAll(`input.${kelas}:checked`)).map(el => el.value);
   document.getElementById(infoId).innerHTML = `${kelas === 'piket' ? 'Petugas Piket' : 'Petugas Jaga'}: <b>${checked.join(', ') || 'Belum dipilih'}</b>`;
 }
 function getSelected(kelas) {
-  return Array.from(document.querySelectorAll(`input.${kelas}:checked`))
-    .map(el => el.value).join(', ');
+  return Array.from(document.querySelectorAll(`input.${kelas}:checked`)).map(el => el.value).join(', ');
 }
 function getShift(jam) {
   const hour = parseInt(jam.split(":")[0]);
@@ -224,9 +272,8 @@ ${kegiatan === "ada" ? keterangan : "nihil"}
 
 _Pesan laporan dikirim dari pesan otomatis by Kalbut.Online_`;
 
-    const tujuan = "6283852330333";
     const encoded = encodeURIComponent(isi);
-    const waURL = `https://wa.me/${tujuan}?text=${encoded}`;
+    const waURL = `https://wa.me/?text=${encoded}`;
     window.open(waURL, "_blank");
   });
 }
